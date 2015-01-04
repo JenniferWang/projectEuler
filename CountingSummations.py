@@ -3,25 +3,31 @@ class Count:
   def __init__(self):
     self.cache = {}
 
-  def help_count(self, n, last):
-    if n < last:
-      return 0
-    if (n, last) in self.cache:
-      return self.cache[(n, last)]
-    if n == last:
+  def memoSearch(self, target, maxCoin):
+    if (target, maxCoin) in self.cache:
+      return self.cache[(target, maxCoin)]
+    if target == 0:
       return 1
-    res = 0
-    for l in range(1, last + 1):
-      res += self.help_count(n - last, l)
-    self.cache[(n, last)] = res
-    return res
+    if maxCoin < 1:
+      return 0
+    if maxCoin > target:
+      self.cache[(target, maxCoin)] = self.memoSearch(target, maxCoin - 1)
+    else:
+      self.cache[(target, maxCoin)] = self.memoSearch(target - maxCoin, maxCoin) \
+        + self.memoSearch(target, maxCoin - 1)
+    return self.cache[(target, maxCoin)]
 
-  def count(self, n):
-    res = 0
-    for last in range(1, n):
-      res += self.help_count(n, last)
-    return res
+  def count(self, target, maxCoin):
+    return self.memoSearch(target, maxCoin)
+
+  def count_another_verison(self, target):
+    ways = [1] + [0] * target
+    for coin in range(1, target):
+      for t in range(coin, target + 1):
+        ways[t] += ways[t - coin]
+    return ways[target]
 
 sol = Count()
-print sol.count(100)
+print sol.count(100, 99)
+print sol.count_another_verison(100)
 
